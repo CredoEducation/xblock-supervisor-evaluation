@@ -1,0 +1,41 @@
+.modal-window .se-builder {
+    width: 100%;
+    height: calc(100% - 55px);
+    position: absolute;
+    overflow-y: scroll;
+    top: 0px;
+}
+
+.se_invitation_sent {
+    color: green;
+    padding-bottom: 10px;
+}
+
+.se_send_email_block {
+    padding-top: 20px;
+}
+
+.se_send_email_input {
+    width: 300px;
+}
+
+.se_error_msg_studio {
+    padding: 10px;
+    color: red;
+    display: none;
+}
+
+.se_error_msg {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: red;
+    display: none;
+}
+
+.se_block_settings td {
+    padding: 10px;
+}
+
+.se_block_label {
+    font-size: 16px;
+}

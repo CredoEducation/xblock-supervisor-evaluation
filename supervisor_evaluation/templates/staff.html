@@ -1,0 +1,47 @@
+{% load i18n %}
+{% load l10n %}
+
+<div class="xblock--supervisor_evaluation--editor editor-with-buttons">
+    {{ js_templates|safe }}
+    <div class="se-builder">
+    <form>
+        <div class="err-msg se_error_msg_studio"></div>
+        <table class="se_block_settings">
+            <tr>
+                <td><label class="se_block_label" for="evaluation_hash">{% trans "Survey block:" %}</label></td>
+                <td>
+                    {% if survey_blocks %}
+                    <select id="evaluation_hash" name="evaluation_hash">
+                    {% for survey_block in survey_blocks %}
+                    <option value="{{ survey_block.evaluation_hash }}" {% if evaluation_block_unique_id == survey_block.evaluation_hash %}selected{% endif %}>{{ survey_block.title }}</option>
+                    {% endfor %}
+                    </select>
+                    {% else %}
+                    <span style="color: red">{% trans "Can't find any blocks that are marked as survey" %}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td><label class="se_block_label" for="links_expiration_date">{% trans "Link's Expiration Date (UTC):" %}</label></td>
+                <td><input id="links_expiration_date" type="text" name="links_expiration_date" placeholder="MM/DD/YYYY" value="{{ links_expiration_date }}"> <input id="links_expiration_time" type="text" name="links_expiration_time" placeholder="HH:MM" value="{{ links_expiration_time }}"></td>
+            </tr>
+            <tr>
+                <td><label class="se_block_label" for="se_email_text">{% trans "Email Text:" %}</label></td>
+                <td><textarea id="se_email_text" name="se_email_text" rows="10" cols="65">{{ email_text }}</textarea></td>
+            </tr>
+        </table>
+    </form>
+    </div>
+
+    <div class="xblock-actions">
+      <ul class="action-buttons">
+        <li class="action-item">
+          <a href="#" class="button action-primary save-button {% if not survey_blocks %}disabled{% endif %}">{% trans "Save" %}</a>
+        </li>
+
+        <li class="action-item">
+          <a href="#" class="button cancel-button">{% trans "Cancel" %}</a>
+        </li>
+      </ul>
+    </div>
+</div>
