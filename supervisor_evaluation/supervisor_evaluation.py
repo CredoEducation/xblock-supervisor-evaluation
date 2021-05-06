@@ -15,8 +15,14 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.urls import reverse
-from credo_modules.models import SupervisorEvaluationInvitation
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+try:
+    from credo_modules.models import SupervisorEvaluationInvitation
+except ImportError:
+    SupervisorEvaluationInvitation = None
+try:
+    from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+except ImportError:
+    configuration_helpers = None
 
 loader = ResourceLoader(__name__)
 
@@ -109,6 +115,9 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin,XBlock):
         return link_url
 
     def student_view(self, context=None):
+        if SupervisorEvaluationInvitation is None:
+            raise Exception("SupervisorEvaluationInvitation can't be imported")
+
         is_studio_view = self.xmodule_runtime.get_real_user is None
         invitation = None
         supervisor_evaluation_url = ''
@@ -224,6 +233,9 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin,XBlock):
 
     @XBlock.json_handler
     def send_email(self, data, suffix=''):
+        if SupervisorEvaluationInvitation is None:
+            raise Exception("SupervisorEvaluationInvitation can't be imported")
+
         email = data.get('email')
         user = self.get_real_user()
         course_id = str(self.xmodule_runtime.course_id)
