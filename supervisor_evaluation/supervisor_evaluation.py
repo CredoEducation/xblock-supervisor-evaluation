@@ -259,11 +259,14 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin,XBlock):
                 'msg': self.i18n_service.gettext('You have already sent invitation')
             }
 
-        links_expiration_lst = self.links_expiration_date.split(' ')
-        if len(links_expiration_lst) > 1:
-            expiration_date = datetime.datetime.strptime(self.links_expiration_date, '%m/%d/%Y %H:%M')
-        else:
-            expiration_date = datetime.datetime.strptime(self.links_expiration_date, '%m/%d/%Y')
+        expiration_date = None
+
+        if self.links_expiration_date:
+            links_expiration_lst = self.links_expiration_date.split(' ')
+            if len(links_expiration_lst) > 1:
+                expiration_date = datetime.datetime.strptime(self.links_expiration_date, '%m/%d/%Y %H:%M')
+            else:
+                expiration_date = datetime.datetime.strptime(self.links_expiration_date, '%m/%d/%Y')
 
         url_hash = str(uuid.uuid4())
 

@@ -23,7 +23,7 @@ def package_data(pkg, root_list):
 
 setup(
     name='xblock-supervisor-evaluation',
-    version='1.0.1',
+    version='1.0.2',
     description='XBlock - Supervisor Evaluation',
     packages=['supervisor_evaluation'],
     install_requires=[

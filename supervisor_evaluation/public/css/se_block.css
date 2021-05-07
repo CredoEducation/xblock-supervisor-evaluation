@@ -32,6 +32,12 @@
     display: none;
 }
 
+.se_studio_notification {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: red;
+}
+
 .se_block_settings td {
     padding: 10px;
 }

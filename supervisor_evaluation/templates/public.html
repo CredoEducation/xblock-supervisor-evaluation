@@ -2,7 +2,6 @@
 {% load l10n %}
 <h3>Supervisor Evaluation</h3>
 
-
 {% if invitation %}
     <div class="se_send_email_block">
     <div class="se_invitation_sent">You have already sent invitation to this email: {{ invitation.email }}</div>
@@ -14,7 +13,7 @@
     <input type="email" name="se_mentor_email" class="se_send_email_input" placeholder="{% trans 'Please enter mentor\'s email' %}"> <button class="se_send_email_btn {% if is_studio_view %}disabled{% endif %}">{% trans "Send" %}</button>
     <div class="se_error_msg"></div>
     {% else %}
-    <div class="se_error_msg">{% trans "Block ID with questions for evaluation is not set" %}</div>
+    <div class="se_studio_notification">{% trans "Block ID with questions for evaluation is not set" %}</div>
     {% endif %}
     </div>
 {% endif %}
