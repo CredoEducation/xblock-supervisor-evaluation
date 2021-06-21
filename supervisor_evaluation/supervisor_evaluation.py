@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.urls import reverse
 try:
-    from credo_modules.models import SupervisorEvaluationInvitation
+    from common.djangoapps.credo_modules.models import SupervisorEvaluationInvitation
 except ImportError:
     SupervisorEvaluationInvitation = None
 try:
@@ -40,7 +40,7 @@ class DummyTranslationService(object):
 @XBlock.needs('i18n')
 @XBlock.needs("user")
 @XBlock.needs("user_state")
-class SupervisorEvaluationBlock(XBlockWithSettingsMixin,XBlock):
+class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
