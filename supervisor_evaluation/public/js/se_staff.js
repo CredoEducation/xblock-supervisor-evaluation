@@ -21,6 +21,7 @@ function SupervisorEvaluationEditBlock(runtime, element, params) {
             var links_expiration_date = $element.find('#links_expiration_date').val();
             var links_expiration_time = $element.find('#links_expiration_time').val();
             var email_text = $element.find("#se_email_text").val();
+            var profile_fields = $element.find("#profile_fields").val();
 
             var handlerUrl = runtime.handlerUrl(element, 'update_editor_context');
             runtime.notify('save', {state: 'start', message: gettext("Saving")});
@@ -29,7 +30,8 @@ function SupervisorEvaluationEditBlock(runtime, element, params) {
                 'evaluation_hash': evaluation_hash,
                 'links_expiration_date': links_expiration_date,
                 'links_expiration_time': links_expiration_time,
-                'email_text': email_text
+                'email_text': email_text,
+                'profile_fields': profile_fields
             }), function(res) {
                 saveBtn.text(gettext('Save')).removeClass('disabled');
                 if (res.result === 'success') {

@@ -22,6 +22,10 @@
                 </td>
             </tr>
             <tr>
+                <td><label class="se_block_label" for="profile_fields">{% trans "Profile Fields (JSON format):" %}</label></td>
+                <td><textarea id="profile_fields" rows="10" cols="65" name="profile_fields">{{ profile_fields }}</textarea></td>
+            </tr>
+            <tr>
                 <td><label class="se_block_label" for="links_expiration_date">{% trans "Link's Expiration Date (UTC):" %}</label></td>
                 <td><input id="links_expiration_date" type="text" name="links_expiration_date" placeholder="MM/DD/YYYY" value="{{ links_expiration_date }}"> <input id="links_expiration_time" type="text" name="links_expiration_time" placeholder="HH:MM" value="{{ links_expiration_time }}"></td>
             </tr>

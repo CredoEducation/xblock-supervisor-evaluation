@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import datetime
+import json
 import re
 import uuid
 
@@ -46,6 +47,14 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
         help=_("The display name for this component."),
         scope=Scope.settings,
         default=_("Supervisor Evaluation"),
+    )
+
+    profile_fields = Dict(
+        display_name=_("Profile Fields"),
+        help=_(
+            'Profile Fields.'
+        ),
+        scope=Scope.settings
     )
 
     evaluation_block_unique_id = String(
@@ -172,7 +181,8 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
             'evaluation_block_unique_id': self.evaluation_block_unique_id,
             'links_expiration_date': links_expiration_date,
             'links_expiration_time': links_expiration_time,
-            'email_text': self.email_text
+            'email_text': self.email_text,
+            'profile_fields': json.dumps(self.profile_fields, indent=4, sort_keys=True) if self.profile_fields else ''
         }
         template = loader.render_django_template("/templates/staff.html", context=context_dict,
                                                  i18n_service=self.i18n_service)
@@ -199,6 +209,16 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
                 'result': 'error',
                 'msg': self.i18n_service.gettext("Email Text must contains '%links%' word")
             }
+
+        profile_fields = data.get('profile_fields')
+        if profile_fields:
+            try:
+                profile_fields = json.loads(profile_fields)
+            except json.decoder.JSONDecodeError:
+                return {
+                    'result': 'error',
+                    'msg': self.i18n_service.gettext('Invalid Profile Fields format (must be valid JSON)')
+                }
 
         links_expiration_date = data.get('links_expiration_date')
         links_expiration_time = data.get('links_expiration_time')
@@ -227,14 +247,55 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
         if links_expiration_date:
             self.links_expiration_date = links_expiration_date
 
+        if profile_fields:
+            self.profile_fields = profile_fields
+
         return {
             'result': 'success'
         }
 
     @XBlock.json_handler
+    def xblock_init(self, data, suffix=''):
+        if SupervisorEvaluationInvitation is None:
+            raise Exception("SupervisorEvaluationInvitation can't be imported")
+
+        is_studio_view = self.xmodule_runtime.get_real_user is None
+        if is_studio_view:
+            return {
+                'result': False
+            }
+
+        user = self.get_real_user()
+        evaluation_block_id = str(self.location)
+        invitation = SupervisorEvaluationInvitation.objects.filter(
+            student=user,
+            evaluation_block_id=evaluation_block_id
+        ).first()
+        if invitation:
+            return {
+                'result': True,
+                'invitation': {
+                    'email': invitation.email,
+                    'url_hash': invitation.url_hash
+                },
+                'link': self.get_supervisor_evaluation_url(self.url_hash)
+            }
+        else:
+            return {
+                'result': False
+            }
+
+    @XBlock.json_handler
     def send_email(self, data, suffix=''):
         if SupervisorEvaluationInvitation is None:
             raise Exception("SupervisorEvaluationInvitation can't be imported")
+
+        is_studio_view = self.xmodule_runtime.get_real_user is None
+        if is_studio_view:
+            return {
+                'result': 'error',
+                'msg': self.i18n_service.gettext('Sending Invitation from Studio is denied')
+            }
 
         email = data.get('email')
         user = self.get_real_user()
