@@ -17,6 +17,7 @@ function SupervisorEvaluationEditBlock(runtime, element, params) {
             saveBtn.text(gettext('Please, wait...')).addClass('disabled');
             errMsgBlock.hide();
 
+            var display_name = $element.find('#se_display_name').val();
             var evaluation_hash = $element.find('#evaluation_hash').val();
             var links_expiration_date = $element.find('#links_expiration_date').val();
             var links_expiration_time = $element.find('#links_expiration_time').val();
@@ -27,6 +28,7 @@ function SupervisorEvaluationEditBlock(runtime, element, params) {
             runtime.notify('save', {state: 'start', message: gettext("Saving")});
 
             $.post(handlerUrl, JSON.stringify({
+                'display_name': display_name,
                 'evaluation_hash': evaluation_hash,
                 'links_expiration_date': links_expiration_date,
                 'links_expiration_time': links_expiration_time,

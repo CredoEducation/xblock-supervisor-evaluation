@@ -43,10 +43,10 @@ class DummyTranslationService(object):
 @XBlock.needs("user_state")
 class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
     display_name = String(
-        display_name=_("Display Name"),
-        help=_("The display name for this component."),
+        display_name=_("Report Display Name"),
+        help=_("Report Display Name."),
         scope=Scope.settings,
-        default=_("Supervisor Evaluation"),
+        default=_("Intern Supervisor Evaluation"),
     )
 
     profile_fields = Dict(
@@ -142,6 +142,7 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
                 supervisor_evaluation_url = self.get_supervisor_evaluation_url(self.url_hash)
 
         context_dict = {
+            'display_name': self.display_name,
             'evaluation_block_unique_id': self.evaluation_block_unique_id,
             'is_studio_view': is_studio_view,
             'invitation': invitation,
@@ -177,6 +178,7 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
                 links_expiration_date, links_expiration_time = links_expiration_lst[0], ''
 
         context_dict = {
+            'display_name': self.display_name,
             'survey_blocks': survey_blocks,
             'evaluation_block_unique_id': self.evaluation_block_unique_id,
             'links_expiration_date': links_expiration_date,
@@ -191,6 +193,13 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
 
     @XBlock.json_handler
     def update_editor_context(self, data, suffix=''):  # pylint: disable=unused-argument
+        display_name = data.get('display_name')
+        if not display_name:
+            return {
+                'result': 'error',
+                'msg': self.i18n_service.gettext('Report Display Name is not set')
+            }
+
         evaluation_hash = data.get('evaluation_hash')
         if not evaluation_hash:
             return {
@@ -241,6 +250,7 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
                     }
                 links_expiration_date = links_expiration_date + ' ' + links_expiration_time
 
+        self.display_name = display_name
         self.evaluation_block_unique_id = evaluation_hash
         self.email_text = email_text
 
@@ -267,23 +277,34 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
 
         user = self.get_real_user()
         evaluation_block_id = str(self.location)
-        invitation = SupervisorEvaluationInvitation.objects.filter(
-            student=user,
-            evaluation_block_id=evaluation_block_id
-        ).first()
+        invitation = None
+        if self.url_hash:
+            invitation = SupervisorEvaluationInvitation.objects.filter(
+                student=user,
+                evaluation_block_id=evaluation_block_id,
+                url_hash=self.url_hash
+            ).first()
         if invitation:
             return {
                 'result': True,
                 'invitation': {
-                    'email': invitation.email,
+                    'email': self._cut_email(invitation.email),
                     'url_hash': invitation.url_hash
                 },
-                'link': self.get_supervisor_evaluation_url(self.url_hash)
+                'link': self.get_supervisor_evaluation_url(invitation.url_hash)
             }
         else:
             return {
                 'result': False
             }
+
+    def _cut_email(self, email):
+        email_parts = email.split('@')
+        email_part1 = email_parts[0][0] + '*' * (len(email_parts[0]) - 1)
+        email_part2 = '.'.join(email_parts[1].split('.')[0:-1])
+        email_part2 = '*' * (len(email_part2) - 1) + email_part2[-1]
+        email_cut = email_part1 + '@' + email_part2 + '.' + email_parts[1].split('.')[-1]
+        return email_cut
 
     @XBlock.json_handler
     def send_email(self, data, suffix=''):
@@ -310,11 +331,7 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
                 'msg': self.i18n_service.gettext('Please, enter valid email address')
             }
 
-        invitation = SupervisorEvaluationInvitation.objects.filter(
-            student=user,
-            evaluation_block_id=evaluation_block_id
-        ).first()
-        if invitation:
+        if self.url_hash:
             return {
                 'result': 'error',
                 'msg': self.i18n_service.gettext('You have already sent invitation')
@@ -345,17 +362,12 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
         from_address = configuration_helpers.get_value('email_from_address', settings.BULK_EMAIL_DEFAULT_FROM_EMAIL)
 
         with transaction.atomic():
-            email_parts = email.split('@')
-            email_part1 = email_parts[0][0] + '*' * (len(email_parts[0]) - 1)
-            email_part2 = '.'.join(email_parts[1].split('.')[0:-1])
-            email_part2 = '*' * (len(email_part2) - 1) + email_part2[-1]
-            email_cut = email_part1 + '@' + email_part2 + '.' + email_parts[1].split('.')[-1]
             se_obj = SupervisorEvaluationInvitation(
                 url_hash=url_hash,
                 course_id=course_id,
                 evaluation_block_id=evaluation_block_id,
                 student=user,
-                email=email_cut,
+                email=email,
                 expiration_date=expiration_date
             )
             se_obj.save()

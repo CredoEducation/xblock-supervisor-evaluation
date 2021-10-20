@@ -8,10 +8,14 @@
         <div class="err-msg se_error_msg_studio"></div>
         <table class="se_block_settings">
             <tr>
+                <td><label class="se_block_label" for="profile_fields">{% trans "Report Display Name:" %}</label></td>
+                <td><input type="text" id="se_display_name" name="display_name" value="{{ display_name }}" class="se_studio_field"></td>
+            </tr>
+            <tr>
                 <td><label class="se_block_label" for="evaluation_hash">{% trans "Survey block:" %}</label></td>
                 <td>
                     {% if survey_blocks %}
-                    <select id="evaluation_hash" name="evaluation_hash">
+                    <select id="evaluation_hash" name="evaluation_hash" class="se_studio_field">
                     {% for survey_block in survey_blocks %}
                     <option value="{{ survey_block.evaluation_hash }}" {% if evaluation_block_unique_id == survey_block.evaluation_hash %}selected{% endif %}>{{ survey_block.title }}</option>
                     {% endfor %}
@@ -23,7 +27,7 @@
             </tr>
             <tr>
                 <td><label class="se_block_label" for="profile_fields">{% trans "Profile Fields (JSON format):" %}</label></td>
-                <td><textarea id="profile_fields" rows="10" cols="65" name="profile_fields">{{ profile_fields }}</textarea></td>
+                <td><textarea id="profile_fields" rows="10" name="profile_fields" class="se_studio_field">{{ profile_fields }}</textarea></td>
             </tr>
             <tr>
                 <td><label class="se_block_label" for="links_expiration_date">{% trans "Link's Expiration Date (UTC):" %}</label></td>
@@ -31,7 +35,7 @@
             </tr>
             <tr>
                 <td><label class="se_block_label" for="se_email_text">{% trans "Email Text:" %}</label></td>
-                <td><textarea id="se_email_text" name="se_email_text" rows="10" cols="65">{{ email_text }}</textarea></td>
+                <td><textarea id="se_email_text" name="se_email_text" rows="10" class="se_studio_field">{{ email_text }}</textarea></td>
             </tr>
         </table>
     </form>
