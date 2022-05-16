@@ -4,18 +4,19 @@ import json
 import re
 import uuid
 
-from xblock.core import XBlock
-from xblock.fields import Boolean, Integer, List, Scope, String, Dict
-from xblockutils.settings import XBlockWithSettingsMixin
-from web_fragments.fragment import Fragment
-from xblockutils.resources import ResourceLoader
-from xmodule.modulestore.django import modulestore
 from django.conf import settings
 from django.core import mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.urls import reverse
+from xblock.core import XBlock
+from xblock.fields import Boolean, Integer, List, Scope, String, Dict
+from xblockutils.settings import XBlockWithSettingsMixin
+from xblockutils.resources import ResourceLoader
+from xmodule.modulestore.django import modulestore
+from web_fragments.fragment import Fragment
+
 try:
     from common.djangoapps.credo_modules.models import SupervisorEvaluationInvitation
 except ImportError:
