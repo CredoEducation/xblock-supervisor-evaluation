@@ -113,8 +113,9 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
         return fragment
 
     def get_real_user(self):
-        anonymous_user_id = self.xmodule_runtime.anonymous_student_id
-        user = self.xmodule_runtime.get_real_user(anonymous_user_id)
+        user_service = self.runtime.service(self, 'user')
+        anonymous_student_id = user_service.get_current_user().opt_attrs.get('edx-platform.anonymous_user_id')
+        user = user_service.get_user_by_anonymous_id(anonymous_student_id)
         return user
 
     def get_supervisor_evaluation_url(self, url_hash):
@@ -128,7 +129,7 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
         if SupervisorEvaluationInvitation is None:
             raise Exception("SupervisorEvaluationInvitation can't be imported")
 
-        is_studio_view = self.xmodule_runtime.get_real_user is None
+        is_studio_view = getattr(self.runtime, "is_author_mode", False)
         invitation = None
         supervisor_evaluation_url = ''
 
@@ -270,7 +271,7 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
         if SupervisorEvaluationInvitation is None:
             raise Exception("SupervisorEvaluationInvitation can't be imported")
 
-        is_studio_view = self.xmodule_runtime.get_real_user is None
+        is_studio_view = getattr(self.runtime, "is_author_mode", False)
         if is_studio_view:
             return {
                 'result': False
@@ -312,7 +313,7 @@ class SupervisorEvaluationBlock(XBlockWithSettingsMixin, XBlock):
         if SupervisorEvaluationInvitation is None:
             raise Exception("SupervisorEvaluationInvitation can't be imported")
 
-        is_studio_view = self.xmodule_runtime.get_real_user is None
+        is_studio_view = getattr(self.runtime, "is_author_mode", False)
         if is_studio_view:
             return {
                 'result': 'error',
